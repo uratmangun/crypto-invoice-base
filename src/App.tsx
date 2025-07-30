@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { Home } from '@/pages/Home'
 import { CreateInvoice } from '@/pages/CreateInvoice'
 import { Login } from '@/pages/Login'
+import ViewInvoice from '@/pages/ViewInvoice'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/create-invoice" element={<CreateInvoice />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/pay/:invoiceId" element={<ViewInvoice />} />
         </Routes>
       </Router>
     </ThemeProvider>

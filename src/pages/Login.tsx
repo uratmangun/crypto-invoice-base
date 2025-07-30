@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -13,61 +13,39 @@ import {
   Zap
 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { usePrivy, useLogin } from '@privy-io/react-auth'
 import { getApiEndpoints, fetchWithFallback } from '@/config/api'
 
 export function Login() {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  
+  // Privy authentication hooks
+  const { ready, authenticated, user } = usePrivy()
+  const { login } = useLogin()
+
+  // Redirect to invoice creation if already authenticated
+  useEffect(() => {
+    if (ready && authenticated && user) {
+      navigate('/create-invoice')
+    }
+  }, [ready, authenticated, user, navigate])
 
   const handleSignInWithBase = async () => {
+    if (!ready) return
+    
     setIsLoading(true)
     
     try {
-      // Generate nonce
-      const nonce = window.crypto.randomUUID().replace(/-/g, '')
+      // Use Privy's login with both wallet and email functionality
+      // This will handle SIWE authentication and email OTP automatically
+      await login({
+        loginMethods: ['wallet', 'email'],
+        walletChainType: 'ethereum-only', // Focus on Ethereum/Base
+        disableSignup: false
+      })
       
-      // Check if Base Account SDK is available
-      if (typeof window !== 'undefined' && (window as any).ethereum) {
-        // Request account access
-        const accounts = await (window as any).ethereum.request({
-          method: 'eth_requestAccounts'
-        })
-        
-        if (accounts.length > 0) {
-          const address = accounts[0]
-          
-          // Create SIWE message
-          const domain = window.location.host
-          const uri = window.location.origin
-          const statement = 'Sign in to Crypto Invoice Generator'
-          const chainId = '0x2105' // Base Mainnet
-          
-          const message = `${domain} wants you to sign in with your Ethereum account:\n${address}\n\n${statement}\n\nURI: ${uri}\nVersion: 1\nChain ID: ${parseInt(chainId, 16)}\nNonce: ${nonce}\nIssued At: ${new Date().toISOString()}`
-          
-          // Request signature
-          const signature = await (window as any).ethereum.request({
-            method: 'personal_sign',
-            params: [message, address]
-          })
-          
-          // Send to backend for verification with fallback endpoints
-          const apiEndpoints = getApiEndpoints()
-          const response = await fetchWithFallback(apiEndpoints.authVerify, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address, message, signature })
-          })
-          
-          if (response.ok) {
-            // Successfully authenticated, redirect to invoice creation
-            navigate('/create-invoice')
-          } else {
-            throw new Error('Authentication failed')
-          }
-        }
-      } else {
-        alert('Please install a Web3 wallet like MetaMask to continue')
-      }
+      // Navigation will be handled by useEffect once authenticated
     } catch (error) {
       console.error('Sign in error:', error)
       alert('Failed to sign in. Please try again.')

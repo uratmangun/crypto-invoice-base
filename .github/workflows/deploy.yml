@@ -122,6 +122,11 @@ jobs:
         run: pnpm run build
         env:
           NODE_ENV: production
+          # Deno API Configuration
+          VITE_DENO_API_URL: ${{ needs.deploy-deno.outputs.deno_url }}
+          # Privy Authentication Configuration
+          VITE_PRIVY_APP_ID: ${{ secrets.VITE_PRIVY_APP_ID }}
+          VITE_PRIVY_CLIENT_ID: ${{ secrets.VITE_PRIVY_CLIENT_ID }}
           
 
       - name: Set project name from repository
