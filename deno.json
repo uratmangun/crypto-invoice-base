@@ -7,11 +7,17 @@
     "function": "deno run --allow-net --allow-read functions/hello.ts"
   },
   "imports": {
-    "@std/": "https://deno.land/std@0.208.0/"
+    "@std/": "https://deno.land/std@0.208.0/",
+    "./": "./",
+    "../": "../"
   },
   "compilerOptions": {
     "allowJs": true,
     "lib": ["deno.window", "deno.ns"],
     "strict": true
+  },
+  "deploy": {
+    "project": "crypto-invoice-base",
+    "exclude": ["node_modules", "dist", "build", ".git"]
   }
 }

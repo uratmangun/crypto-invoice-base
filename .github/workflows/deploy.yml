@@ -59,13 +59,21 @@ jobs:
           PROJECT_NAME="${{ steps.deno_project_name.outputs.deno_project_name }}"
           echo "Deploying to Deno Deploy project: ${PROJECT_NAME}"
           
-          # Deploy with explicit configuration
+          # Verify deno.json exists
+          if [ ! -f "deno.json" ]; then
+            echo "❌ Error: deno.json not found"
+            exit 1
+          fi
+          
+          echo "✅ Found deno.json with import map"
+          cat deno.json
+          
+          # Deploy with explicit configuration and proper import map
           deployctl deploy \
             --project="${PROJECT_NAME}" \
-            --import-map=deno.json \
+            --config=deno.json \
             --token="${{ secrets.DENO_DEPLOY_TOKEN }}" \
-            --include=functions/ \
-            --exclude=node_modules/,dist/,build/,.git/ \
+            --exclude=node_modules,dist,build,.git,src,public,*.md \
             main.ts
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
