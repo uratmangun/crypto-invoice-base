@@ -1,25 +1,14 @@
 {
   "enabled": true,
-  "name": "AUTO README GENERATOR",
-  "description": "Automatically generates or updates the README.md file by analyzing the project structure, files, and directories",
+  "name": "AUTO README GENERATOR FILE EDITED",
+  "description": "Automatically generates or updates the README.md file when files are edited in src directory",
   "version": "1",
   "when": {
-    "type": "userTriggered",
+    "type": "fileEdited",
     "patterns": [
       "src/**/*",
       ".kiro/specs/**/*",
-      "functions/**/*",
-      "**/*.js",
-      "**/*.ts",
-      "**/*.jsx",
-      "**/*.tsx",
-      "**/*.md",
-      "**/*.sql",
-      "**/*.json",
-      "**/*.toml",
-      "**/package.json",
-      "**/tsconfig.json",
-      "supabase/**"
+      "functions/**/*"
     ]
   },
   "then": {

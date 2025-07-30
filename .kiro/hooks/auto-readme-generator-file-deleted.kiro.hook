@@ -1,25 +1,14 @@
 {
   "enabled": true,
-  "name": "AUTO README GENERATOR",
-  "description": "Automatically generates or updates the README.md file by analyzing the project structure, files, and directories",
+  "name": "AUTO README GENERATOR FILE DELETED",
+  "description": "Automatically generates or updates the README.md file when files are deleted in src directory",
   "version": "1",
   "when": {
-    "type": "userTriggered",
+    "type": "fileDeleted",
     "patterns": [
       "src/**/*",
       ".kiro/specs/**/*",
-      "functions/**/*",
-      "**/*.js",
-      "**/*.ts",
-      "**/*.jsx",
-      "**/*.tsx",
-      "**/*.md",
-      "**/*.sql",
-      "**/*.json",
-      "**/*.toml",
-      "**/package.json",
-      "**/tsconfig.json",
-      "supabase/**"
+      "functions/**/*"
     ]
   },
   "then": {
