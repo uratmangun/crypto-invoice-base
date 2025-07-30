@@ -9,6 +9,8 @@ async function handler(request: Request): Promise<Response> {
 }
 
 console.log(`🦕 Deno server running on http://localhost:${PORT}`);
-console.log(`📡 Function endpoint: http://localhost:${PORT}/api/hello`);
+console.log(`📡 Function endpoints:`);
+console.log(`   - http://localhost:${PORT}/api/hello`);
+console.log(`   - http://localhost:${PORT}/api/auth/verify`);
 
 Deno.serve({ port: PORT }, handler);

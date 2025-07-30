@@ -1,5 +1,6 @@
 // Main entry point for Deno Deploy - routes to all functions
 import helloFunction from './functions/hello.ts';
+import authVerifyFunction from './functions/auth/verify.ts';
 
 // Function registry - add new functions here
 const functions = {
@@ -8,21 +9,38 @@ const functions = {
   // example: exampleFunction,
 };
 
+// Nested function registry for auth endpoints
+const nestedFunctions = {
+  'auth/verify': authVerifyFunction,
+};
+
 export default {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     
     // Extract function name from path
-    // Supports both /api/hello and /hello patterns
+    // Supports /api/hello, /hello, and nested /api/auth/verify patterns
     const pathParts = url.pathname.split('/').filter(part => part.length > 0);
     let functionName = '';
+    let nestedPath = '';
     
     if (pathParts.length >= 2 && pathParts[0] === 'api') {
-      // /api/hello pattern
-      functionName = pathParts[1];
+      if (pathParts.length >= 3) {
+        // /api/auth/verify pattern - handle nested routes
+        nestedPath = pathParts.slice(1).join('/');
+      } else {
+        // /api/hello pattern
+        functionName = pathParts[1];
+      }
     } else if (pathParts.length >= 1) {
       // /hello pattern
       functionName = pathParts[0];
+    }
+    
+    // Route to nested functions first
+    if (nestedPath && nestedFunctions[nestedPath as keyof typeof nestedFunctions]) {
+      const targetFunction = nestedFunctions[nestedPath as keyof typeof nestedFunctions];
+      return await targetFunction(request);
     }
     
     // Route to the appropriate function
