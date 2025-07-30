@@ -2,15 +2,20 @@
 import helloFunction from './functions/hello.ts';
 import authVerifyFunction from './functions/auth/verify.ts';
 
+// Type definitions for function handlers
+type FunctionHandler = {
+  fetch: (request: Request) => Promise<Response>;
+} | ((request: Request) => Promise<Response>);
+
 // Function registry - add new functions here
-const functions = {
+const functions: Record<string, FunctionHandler> = {
   hello: helloFunction,
   // Add more functions here as you create them
   // example: exampleFunction,
 };
 
 // Nested function registry for auth endpoints
-const nestedFunctions = {
+const nestedFunctions: Record<string, (request: Request) => Promise<Response>> = {
   'auth/verify': authVerifyFunction,
 };
 
@@ -46,7 +51,12 @@ export default {
     // Route to the appropriate function
     if (functionName && functions[functionName as keyof typeof functions]) {
       const targetFunction = functions[functionName as keyof typeof functions];
-      return await targetFunction.fetch(request);
+      // Check if it's an object with fetch method or a direct function
+      if (typeof targetFunction === 'function') {
+        return await targetFunction(request);
+      } else if (targetFunction && typeof targetFunction.fetch === 'function') {
+        return await targetFunction.fetch(request);
+      }
     }
     
     // Handle root path - return available functions

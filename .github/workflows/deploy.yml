@@ -58,7 +58,15 @@ jobs:
         run: |
           PROJECT_NAME="${{ steps.deno_project_name.outputs.deno_project_name }}"
           echo "Deploying to Deno Deploy project: ${PROJECT_NAME}"
-          deployctl deploy --project="${PROJECT_NAME}" --import-map=deno.json --token="${{ secrets.DENO_DEPLOY_TOKEN }}" main.ts
+          
+          # Deploy with explicit configuration
+          deployctl deploy \
+            --project="${PROJECT_NAME}" \
+            --import-map=deno.json \
+            --token="${{ secrets.DENO_DEPLOY_TOKEN }}" \
+            --include=functions/ \
+            --exclude=node_modules/,dist/,build/,.git/ \
+            main.ts
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
 
