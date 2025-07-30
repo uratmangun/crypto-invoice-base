@@ -40,7 +40,7 @@ export function Login() {
       // Use Privy's login with both wallet and email functionality
       // This will handle SIWE authentication and email OTP automatically
       await login({
-        loginMethods: ['wallet', 'email'],
+        loginMethods: ['wallet'],
         walletChainType: 'ethereum-only', // Focus on Ethereum/Base
         disableSignup: false
       })
@@ -111,7 +111,7 @@ export function Login() {
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Authenticate with your Base account using wallet signatures - no passwords required.
+                Authenticate with your Coinbase Smart Wallet on Base - no passwords required.
               </p>
             </div>
 
@@ -134,7 +134,7 @@ export function Login() {
                     backgroundColor: '#0000FF'
                   }}
                 />
-                <span>{isLoading ? 'Connecting...' : 'Sign in with Base'}</span>
+                <span>{isLoading ? 'Connecting...' : 'Sign in with Coinbase Smart Wallet'}</span>
               </button>
 
             
