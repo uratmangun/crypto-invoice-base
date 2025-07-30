@@ -1,8 +1,21 @@
-# Cloudflare Pages + Deno Deploy Full-Stack Boilerplate
+# Crypto Invoice Generator
 
-A modern, production-ready full-stack application combining React frontend with Deno serverless functions, optimized for Cloudflare Pages and Deno Deploy.
+A modern, decentralized invoice generation and payment platform built on Base Network using USDC. Create and pay invoices with cryptocurrency for fast, secure, and global transactions.
 
 ## ✨ Features
+
+### Crypto Payment System
+- **Base Network Integration** - Built on Coinbase's Layer 2 solution for fast, low-cost transactions
+- **USDC Payments** - Stable cryptocurrency payments (1 USDC = 1 USD)
+- **Wallet Connection** - Seamless Web3 wallet integration
+- **Global Accessibility** - Send and receive payments anywhere in the world
+- **24/7 Availability** - Blockchain never sleeps - create and pay invoices anytime
+
+### Invoice Management
+- **Lightning Fast Creation** - Generate professional invoices in seconds
+- **Secure & Transparent** - All transactions verifiable on the blockchain
+- **No Setup Fees** - Start using immediately without upfront costs
+- **Instant Payments** - No waiting days for traditional bank transfers
 
 ### Frontend
 - **React 19** - Latest version with modern hooks and concurrent features
@@ -11,6 +24,7 @@ A modern, production-ready full-stack application combining React frontend with 
 - **Tailwind CSS** - Utility-first CSS framework for rapid styling
 - **shadcn/ui** - Beautiful, accessible, and customizable UI components
 - **Dark/Light Theme** - Built-in theme switching with system preference detection
+- **Stagewise Toolbar** - Development and debugging tools integration
 
 ### Backend
 - **Deno Runtime** - Modern JavaScript/TypeScript runtime for serverless functions
@@ -34,16 +48,10 @@ A modern, production-ready full-stack application combining React frontend with 
 
 ### Installation
 
-1. **Create from template** (recommended):
+1. **Clone the repository**:
 ```bash
-gh repo create my-project --template uratmangun/cloudflare-deno-kiro --public --clone
-cd my-project
-```
-
-2. **Or clone directly**:
-```bash
-git clone https://github.com/uratmangun/cloudflare-deno-kiro.git
-cd cloudflare-deno-kiro
+git clone https://github.com/your-username/crypto-invoice-generator.git
+cd crypto-invoice-generator
 ```
 
 3. **Install dependencies**:
@@ -98,59 +106,110 @@ deno task function
 ## 📁 Project Structure
 
 ```
-├── src/                     # React frontend
+├── src/                     # React frontend (Crypto Invoice UI)
 │   ├── components/
-│   │   ├── ui/             # shadcn/ui components
-│   │   └── ThemeToggle.tsx # Theme switching component
+│   │   ├── ui/             # shadcn/ui components (Button, Card)
+│   │   └── ThemeToggle.tsx # Dark/light theme switching
 │   ├── contexts/
 │   │   └── ThemeContext.tsx # Theme context provider
 │   ├── lib/
-│   │   └── utils.ts        # Utility functions
-│   ├── App.tsx             # Main application
-│   └── main.tsx            # React entry point
+│   │   └── utils.ts        # Utility functions (cn, etc.)
+│   ├── assets/             # Static assets (React logo, etc.)
+│   ├── App.tsx             # Main crypto invoice landing page
+│   ├── App.css             # Application styles
+│   ├── main.tsx            # React entry point
+│   └── index.css           # Global styles with CSS variables
 │
 ├── functions/              # Deno serverless functions
-│   └── hello.ts           # Example function
+│   └── hello.ts           # Example API function
 │
 ├── main.ts                # Deno function router
 ├── server.ts              # Local development server
-├── deno.json              # Deno configuration
+├── deno.json              # Deno configuration and tasks
 │
 ├── .github/workflows/     # CI/CD pipeline
 │   └── deploy.yml         # Automated deployment
 │
-├── .kiro/specs/           # Project specifications
-│   └── cloudflare-deno-integration/
+├── .kiro/                 # Kiro AI assistant configuration
+│   └── steering/          # AI steering rules and workflows
 │
+├── .windsurf/             # Windsurf IDE configuration
+│   ├── rules/             # Development rules
+│   └── workflows/         # Automated workflows
+│
+├── ai-schema/             # AI schema definitions
+│   ├── kiro-hooks-schema.txt
+│   ├── kiro-specs-*.md
+│   └── windsurf-workflow-schema.txt
+│
+├── public/                # Static assets
+│   └── vite.svg          # Vite logo
+│
+├── PITCH/                 # Project pitch materials
 ├── package.json           # Node.js dependencies
-├── vite.config.ts         # Vite configuration
-└── netlify.toml          # Legacy Netlify config
+├── vite.config.ts         # Vite configuration with Tailwind
+├── tsconfig.*.json        # TypeScript configurations
+├── eslint.config.js       # ESLint configuration
+├── DENO_SETUP.md         # Deno setup instructions
+├── DEPLOYMENT_SECRETS.md  # Deployment configuration guide
+└── LICENSE               # MIT License
 ```
 
 ## 🎨 Frontend Features
 
-### UI Components
-- **shadcn/ui** - Pre-built accessible components
-- **Button** - Multiple variants and sizes
-- **Card** - Structured content containers
-- **Theme Toggle** - Dark/light mode switching
-- **Lucide Icons** - Beautiful icon library
+### Landing Page
+- **Hero Section** - Compelling introduction to crypto invoicing
+- **Feature Showcase** - Six key benefits with beautiful gradient cards:
+  - ⚡ Lightning Fast - Instant payments on Base network
+  - 🛡️ Secure & Transparent - Blockchain-verified transactions
+  - 💰 USDC Stable - No volatility concerns with stablecoin payments
+  - 🌍 Global Reach - Borderless payments worldwide
+  - 👥 Easy to Use - Simple interface for everyone
+  - 🕐 24/7 Available - Always-on blockchain infrastructure
 
-### Serverless Function Integration
-- **API Client** - Automatic endpoint detection
-- **Error Handling** - Graceful fallbacks and error states
-- **Loading States** - User feedback during API calls
-- **CORS Support** - Cross-origin request handling
+### UI Components
+- **shadcn/ui** - Pre-built accessible components with custom styling
+- **Gradient Cards** - Beautiful feature cards with hover effects
+- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Theme Toggle** - Dark/light mode switching with system preference
+- **Lucide Icons** - Professional icon library for crypto and finance
+- **Call-to-Action Buttons** - Prominent wallet connection and demo buttons
+
+### Web3 Integration (Planned)
+- **Wallet Connection** - MetaMask, WalletConnect, and other Web3 wallets
+- **Base Network** - Optimized for Coinbase's Layer 2 solution
+- **USDC Payments** - Stablecoin payment processing
+- **Transaction History** - View and track all invoice payments
+- **Smart Contract Integration** - Automated payment verification
 
 ### Adding More Functions
 
 1. Create a new file in `functions/` directory:
 ```typescript
-// functions/example.ts
+// functions/invoice.ts
 export default {
   async fetch(request: Request): Promise<Response> {
-    return new Response(JSON.stringify({ message: "Hello!" }), {
-      headers: { "Content-Type": "application/json" }
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 200, headers: corsHeaders });
+    }
+
+    // Invoice creation logic here
+    const invoice = {
+      id: crypto.randomUUID(),
+      amount: 100,
+      currency: 'USDC',
+      status: 'pending',
+      created: new Date().toISOString()
+    };
+
+    return new Response(JSON.stringify(invoice), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }
 };
@@ -158,15 +217,64 @@ export default {
 
 2. Register in `main.ts`:
 ```typescript
-import exampleFunction from './functions/example.ts';
+import helloFunction from './functions/hello.ts';
+import invoiceFunction from './functions/invoice.ts';
 
 const functions = {
   hello: helloFunction,
-  example: exampleFunction, // Add here
+  invoice: invoiceFunction, // Add here
 };
 ```
 
-3. Access at `/api/example` or `/example`
+3. Access at `/api/invoice` or `/invoice`
+
+## 💰 Crypto Invoice Features
+
+### Current Implementation
+The application currently features a beautiful landing page showcasing the crypto invoice concept with:
+
+- **Hero Section** with compelling value proposition
+- **Feature Cards** highlighting key benefits:
+  - Lightning Fast payments on Base network
+  - Secure & Transparent blockchain transactions
+  - USDC Stable payments (no volatility)
+  - Global Reach (borderless payments)
+  - Easy to Use interface
+  - 24/7 Availability
+- **Call-to-Action** buttons for wallet connection and demos
+- **Responsive Design** with dark/light theme support
+
+### Planned Web3 Integration
+
+#### Invoice Creation
+```typescript
+// Planned invoice structure
+interface CryptoInvoice {
+  id: string;
+  amount: number;
+  currency: 'USDC';
+  recipient: string; // Wallet address
+  description: string;
+  dueDate: Date;
+  status: 'pending' | 'paid' | 'expired';
+  paymentAddress: string; // Base network address
+  transactionHash?: string;
+}
+```
+
+#### Payment Processing
+- **Smart Contract Integration** for automated payment verification
+- **Base Network RPC** for transaction monitoring
+- **USDC Token Contract** interaction for payment processing
+- **Wallet Connection** via Web3 providers (MetaMask, WalletConnect)
+
+#### Features to Implement
+1. **Invoice Generator** - Create invoices with USDC amounts
+2. **Payment Gateway** - Process payments through Base network
+3. **Transaction Tracking** - Monitor payment status in real-time
+4. **Wallet Integration** - Connect and manage Web3 wallets
+5. **Payment History** - View all sent and received invoices
+6. **QR Code Generation** - Easy mobile payments with QR codes
 
 ## 🚀 Deployment
 
@@ -251,9 +359,12 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 | **Backend Runtime** | Deno 2.x |
 | **Language** | TypeScript |
 | **Build Tool** | Vite |
-| **Styling** | Tailwind CSS |
+| **Styling** | Tailwind CSS 4.x |
 | **UI Components** | shadcn/ui + Radix UI |
 | **Icons** | Lucide React |
+| **Blockchain** | Base Network (Layer 2) |
+| **Cryptocurrency** | USDC (USD Coin) |
+| **Web3 Tools** | Stagewise Toolbar + React Plugin |
 | **Frontend Hosting** | Cloudflare Pages |
 | **Backend Hosting** | Deno Deploy |
 | **CI/CD** | GitHub Actions |
@@ -295,7 +406,7 @@ pnpm dev  # Starts both React (5173) and Deno (8000)
 ### Function Structure
 
 ```typescript
-// functions/example.ts
+// functions/payment.ts
 export default {
   async fetch(request: Request): Promise<Response> {
     const corsHeaders = {
@@ -308,10 +419,17 @@ export default {
       return new Response(null, { status: 200, headers: corsHeaders });
     }
 
-    // Your function logic here
-    const data = { message: 'Hello from Deno!' };
+    // Payment processing logic for USDC on Base
+    const paymentData = {
+      transactionHash: '0x...',
+      amount: '100.00',
+      currency: 'USDC',
+      network: 'base',
+      status: 'confirmed',
+      timestamp: new Date().toISOString()
+    };
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(paymentData), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }
@@ -342,11 +460,18 @@ export default {
 - Verify Cloudflare API token permissions
 - Check GitHub Actions logs for specific errors
 
+#### Web3 Integration Issues (Future)
+- Wallet connection failures
+- Base network RPC errors
+- USDC contract interaction problems
+- Transaction confirmation delays
+
 ### Getting Help
 
-1. Check the [GitHub Issues](https://github.com/uratmangun/cloudflare-deno-kiro/issues)
+1. Check the [GitHub Issues](https://github.com/your-username/crypto-invoice-generator/issues)
 2. Review the [deployment documentation](DEPLOYMENT_SECRETS.md)
-3. Check Cloudflare and Deno Deploy documentation
+3. Check Base Network documentation for Web3 integration
+4. Consult USDC and stablecoin payment guides
 
 ## 🤝 Contributing
 
@@ -363,15 +488,23 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🌟 Features in Detail
 
-### Full-Stack Integration
-- **Seamless API calls** between React frontend and Deno backend
-- **Automatic endpoint detection** for development and production
-- **Environment-aware configuration** with fallback strategies
+### Crypto Payment Innovation
+- **Base Network Integration** - Built on Coinbase's Layer 2 for fast, cheap transactions
+- **USDC Stability** - Eliminate cryptocurrency volatility with USD-pegged stablecoin
+- **Global Accessibility** - Send invoices and receive payments from anywhere in the world
+- **Instant Settlement** - No waiting 3-5 business days for traditional bank transfers
+
+### User Experience
+- **One-Click Invoice Creation** - Generate professional invoices in seconds
+- **Wallet Integration** - Connect MetaMask, Coinbase Wallet, and other Web3 wallets
+- **Real-time Updates** - Track payment status with blockchain confirmations
+- **Mobile Responsive** - Full functionality on desktop, tablet, and mobile devices
 
 ### Developer Experience
 - **Hot reload** for both frontend and backend during development
 - **TypeScript everywhere** for type safety across the stack
 - **Modern tooling** with Vite, ESLint, and Deno's built-in formatter
+- **Stagewise integration** for enhanced development workflow
 
 ### Production Ready
 - **Global CDN** deployment with Cloudflare Pages
@@ -382,10 +515,49 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 ### Scalability
 - **Serverless architecture** scales automatically with demand
 - **Edge deployment** reduces latency worldwide
+- **Blockchain infrastructure** handles high transaction volumes
 - **Stateless functions** enable horizontal scaling
 
 ---
 
-**🚀 Ready for production** • **⚡ Lightning fast** • **🌍 Global deployment** • **🔧 Fully customizable**
+**💰 Crypto-native** • **⚡ Lightning fast** • **🌍 Global payments** • **🔧 Fully customizable**
 
-Built with modern web technologies for the edge computing era.
+Built for the decentralized future of finance and payments.
+
+## 🚧 Development Status
+
+### ✅ Completed
+- **Landing Page** - Beautiful, responsive crypto invoice showcase
+- **UI Components** - Complete shadcn/ui integration with custom styling
+- **Theme System** - Dark/light mode with system preference detection
+- **Development Setup** - Full-stack development environment with hot reload
+- **Deployment Pipeline** - Automated CI/CD with GitHub Actions
+- **Project Structure** - Organized codebase ready for Web3 integration
+
+### 🔄 In Progress
+- **Web3 Integration** - Wallet connection and Base network setup
+- **Smart Contracts** - USDC payment processing contracts
+- **Invoice System** - Create, send, and track crypto invoices
+
+### 📋 Roadmap
+1. **Phase 1: Web3 Foundation**
+   - Wallet connection (MetaMask, WalletConnect)
+   - Base network integration
+   - USDC token contract interaction
+
+2. **Phase 2: Invoice Core**
+   - Invoice creation and management
+   - Payment processing with USDC
+   - Transaction monitoring and confirmations
+
+3. **Phase 3: Advanced Features**
+   - QR code generation for mobile payments
+   - Payment history and analytics
+   - Multi-currency support (ETH, other tokens)
+   - Recurring invoice automation
+
+4. **Phase 4: Enterprise Features**
+   - Team collaboration and permissions
+   - API for third-party integrations
+   - Advanced reporting and tax features
+   - White-label solutions
