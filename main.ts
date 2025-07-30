@@ -1,6 +1,8 @@
 // Main entry point for Deno Deploy - routes to all functions
 import helloFunction from './functions/hello.ts';
 import authVerifyFunction from './functions/auth/verify.ts';
+import saveInvoiceFunction from './functions/save-invoice.ts';
+import getInvoiceFunction from './functions/get-invoice.ts';
 
 // Type definitions for function handlers
 type FunctionHandler = {
@@ -10,6 +12,8 @@ type FunctionHandler = {
 // Function registry - add new functions here
 const functions: Record<string, FunctionHandler> = {
   hello: helloFunction,
+  'save-invoice': saveInvoiceFunction,
+  'get-invoice': getInvoiceFunction,
   // Add more functions here as you create them
   // example: exampleFunction,
 };
@@ -46,6 +50,17 @@ export default {
     if (nestedPath && nestedFunctions[nestedPath as keyof typeof nestedFunctions]) {
       const targetFunction = nestedFunctions[nestedPath as keyof typeof nestedFunctions];
       return await targetFunction(request);
+    }
+    
+    // Handle dynamic routes like /api/get-invoice/{invoiceId}
+    if (pathParts.length >= 3 && pathParts[0] === 'api' && pathParts[1] === 'get-invoice') {
+      // This is a get-invoice request with an invoice ID
+      const targetFunction = functions['get-invoice'];
+      if (typeof targetFunction === 'function') {
+        return await targetFunction(request);
+      } else if (targetFunction && typeof targetFunction.fetch === 'function') {
+        return await targetFunction.fetch(request);
+      }
     }
     
     // Route to the appropriate function

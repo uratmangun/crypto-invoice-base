@@ -70,9 +70,9 @@ export function Home() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Link to="/create-invoice">
+                    <Link to="/receive-payment">
                       <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold border-2 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-white transition-all duration-300">
-                        Create Quick Invoice
+                        Accept USDC Payment
                       </Button>
                     </Link>
                   </TooltipTrigger>

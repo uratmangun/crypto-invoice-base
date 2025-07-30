@@ -11,6 +11,12 @@ This project uses GitHub Actions to automatically deploy to both Deno Deploy and
    - Create a new access token
    - Copy the token and add it as a GitHub secret
 
+2. **`REDIS_URL`**
+   - Redis connection URL for storing invoice data
+   - Format: `redis://username:password@host:port`
+   - Example: `redis://default:password@redis-host.com:6379`
+   - Get this from your Redis provider (Redis Cloud, Upstash, etc.)
+
 **Note**: The Deno project name will automatically use your GitHub repository name, so no `DENO_PROJECT_NAME` secret is needed!
 
 ### For Cloudflare Pages
@@ -26,7 +32,18 @@ This project uses GitHub Actions to automatically deploy to both Deno Deploy and
    - Found in your Cloudflare dashboard sidebar
    - Or get it from the URL when viewing your account
 
-4. **`ADMIN_TOKEN`** (Optional)
+5. **`VITE_PRIVY_APP_ID`**
+   - Your Privy App ID from the Privy Dashboard
+   - Go to [dashboard.privy.io](https://dashboard.privy.io)
+   - Create a new app or use existing one
+   - Copy the App ID from your app settings
+
+6. **`VITE_PRIVY_CLIENT_ID`**
+   - Your Privy Client ID from the Privy Dashboard
+   - Found in the same location as your App ID
+   - Used for authentication configuration
+
+7. **`ADMIN_TOKEN`** (Optional)
    - GitHub Personal Access Token for updating repository settings
    - Only needed if you want the workflow to update the repository's website URL
 

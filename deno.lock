@@ -10,6 +10,7 @@
     "npm:@stagewise/toolbar-react@~0.6.2": "0.6.2_@types+react@19.1.9_react@19.1.1",
     "npm:@tailwindcss/postcss@^4.1.11": "4.1.11",
     "npm:@tailwindcss/vite@^4.1.11": "4.1.11_vite@7.0.6__picomatch@4.0.3",
+    "npm:@types/qrcode@^1.5.5": "1.5.5",
     "npm:@types/react-dom@^19.1.6": "19.1.7_@types+react@19.1.9",
     "npm:@types/react-router-dom@^5.3.3": "5.3.3",
     "npm:@types/react@^19.1.8": "19.1.9",
@@ -24,7 +25,9 @@
     "npm:globals@^16.3.0": "16.3.0",
     "npm:lucide-react@0.532": "0.532.0_react@19.1.1",
     "npm:postcss@^8.5.6": "8.5.6",
+    "npm:qrcode@^1.5.4": "1.5.4",
     "npm:react-dom@^19.1.0": "19.1.1_react@19.1.1",
+    "npm:react-qr-code@^2.0.18": "2.0.18_react@19.1.1",
     "npm:react-router-dom@^7.7.1": "7.7.1_react@19.1.1_react-dom@19.1.1__react@19.1.1",
     "npm:react@^19.1.0": "19.1.1",
     "npm:tailwind-merge@^3.3.1": "3.3.1",
@@ -2111,6 +2114,12 @@
         "undici-types"
       ]
     },
+    "@types/qrcode@1.5.5": {
+      "integrity": "sha512-CdfBi/e3Qk+3Z/fXYShipBT13OJ2fDO2Q2w5CIP5anLTLIndQG9z6P1cnm+8zCWSpm5dnxMFd/uREtb0EXuQzg==",
+      "dependencies": [
+        "@types/node@22.15.15"
+      ]
+    },
     "@types/react-dom@19.1.7_@types+react@19.1.9": {
       "integrity": "sha512-i5ZzwYpqjmrKenzkoLM2Ibzt6mAsM7pxB6BCIouEVVmgiqaMj1TjaK7hnA36hbW5aZv20kx7Lw6hWzPWg0Rurw==",
       "dependencies": [
@@ -3951,6 +3960,13 @@
     "lokijs@1.5.12": {
       "integrity": "sha512-Q5ALD6JiS6xAUWCwX3taQmgwxyveCtIIuL08+ml0nHwT3k0S/GIFJN+Hd38b1qYIMaE5X++iqsqWVksz7SYW+Q=="
     },
+    "loose-envify@1.4.0": {
+      "integrity": "sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==",
+      "dependencies": [
+        "js-tokens"
+      ],
+      "bin": true
+    },
     "lru-cache@10.4.3": {
       "integrity": "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ=="
     },
@@ -4094,6 +4110,9 @@
     },
     "normalize-range@0.1.2": {
       "integrity": "sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA=="
+    },
+    "object-assign@4.1.1": {
+      "integrity": "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg=="
     },
     "ofetch@1.4.1": {
       "integrity": "sha512-QZj2DfGplQAr2oj9KzceK9Hwz6Whxazmn85yYeVuS3u9XTMOGMRx0kO95MQ+vLsj/S/NwBDMMLU5hpxvI6Tklw==",
@@ -4381,6 +4400,14 @@
     "process@0.11.10": {
       "integrity": "sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A=="
     },
+    "prop-types@15.8.1": {
+      "integrity": "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==",
+      "dependencies": [
+        "loose-envify",
+        "object-assign",
+        "react-is"
+      ]
+    },
     "proxy-compare@2.6.0": {
       "integrity": "sha512-8xuCeM3l8yqdmbPoYeLbrAXCBWu19XEYc5/F28f5qOaoAIMyfmBUkl5axiK+x9olUvRlcekvnm98AP9RDngOIw=="
     },
@@ -4396,6 +4423,9 @@
     },
     "punycode@2.3.1": {
       "integrity": "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="
+    },
+    "qr.js@0.0.0": {
+      "integrity": "sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ=="
     },
     "qrcode@1.5.3": {
       "integrity": "sha512-puyri6ApkEHYiVl4CFzo1tDkAZ+ATcnbJrJ6RiBM1Fhctdn/ix9MTE3hRph33omisEbC/2fcfemsseiKgBPKZg==",
@@ -4453,6 +4483,17 @@
       "dependencies": [
         "react",
         "scheduler"
+      ]
+    },
+    "react-is@16.13.1": {
+      "integrity": "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="
+    },
+    "react-qr-code@2.0.18_react@19.1.1": {
+      "integrity": "sha512-v1Jqz7urLMhkO6jkgJuBYhnqvXagzceg3qJUWayuCK/c6LTIonpWbwxR1f1APGd4xrW/QcQEovNrAojbUz65Tg==",
+      "dependencies": [
+        "prop-types",
+        "qr.js",
+        "react"
       ]
     },
     "react-refresh@0.17.0": {
@@ -5336,6 +5377,37 @@
       ]
     }
   },
+  "remote": {
+    "https://deno.land/std@0.208.0/dotenv/mod.ts": "039468f5c87d39b69d7ca6c3d68ebca82f206ec0ff5e011d48205eea292ea5a6",
+    "https://deno.land/std@0.224.0/assert/assert.ts": "09d30564c09de846855b7b071e62b5974b001bb72a4b797958fe0660e7849834",
+    "https://deno.land/std@0.224.0/assert/assertion_error.ts": "ba8752bd27ebc51f723702fac2f54d3e94447598f54264a6653d6413738a8917",
+    "https://deno.land/std@0.224.0/async/delay.ts": "f90dd685b97c2f142b8069082993e437b1602b8e2561134827eeb7c12b95c499",
+    "https://deno.land/std@0.224.0/bytes/concat.ts": "86161274b5546a02bdb3154652418efe7af8c9310e8d54107a68aaa148e0f5ed",
+    "https://deno.land/std@0.224.0/bytes/copy.ts": "08d85062240a7223e6ec4e2af193ad1a50c59a43f0d86ac3a7b16f3e0d77c028",
+    "https://deno.land/std@0.224.0/io/buf_reader.ts": "aa6d589e567c964c8ba1f582648f3feac45e88ab2e3d2cc2c9f84fd73c05d051",
+    "https://deno.land/std@0.224.0/io/buf_writer.ts": "3fab3fbeae7a6ed1672207b640b6781a2369890878f8a7bb35f95d364dd6dae6",
+    "https://deno.land/x/redis@v0.32.4/backoff.ts": "33e4a6e245f8743fbae0ce583993a671a3ac2ecee433a3e7f0bd77b5dd541d84",
+    "https://deno.land/x/redis@v0.32.4/connection.ts": "393f1960f7ea2569ef5542c1dd7b54d5549487cf21443778553005f762bad879",
+    "https://deno.land/x/redis@v0.32.4/errors.ts": "4c47b278c8a87e0f49c0f7a96c74c5bee09e4d5ea19f892923b0281707112d04",
+    "https://deno.land/x/redis@v0.32.4/executor.ts": "5ac4c1f7bec44d12ebc0f3702bf074bd3ba6c1aae74953582f6358d2948718e7",
+    "https://deno.land/x/redis@v0.32.4/internal/encoding.ts": "0525f7f444a96b92cd36423abdfe221f8d8de4a018dc5cb6750a428a5fc897c2",
+    "https://deno.land/x/redis@v0.32.4/internal/symbols.ts": "e36097bab1da1c9fe84a3bb9cb0ed1ec10c3dc7dd0b557769c5c54e15d110dd2",
+    "https://deno.land/x/redis@v0.32.4/mod.ts": "a2a2318e67db704c799a13cc840114b9f344a82cf682c933a293e90b1a02b3fa",
+    "https://deno.land/x/redis@v0.32.4/pipeline.ts": "f0ec80f58a88e9b9b157155882c2bb3568890e6b4d67ad99760a6fc2c51b47ba",
+    "https://deno.land/x/redis@v0.32.4/protocol/deno_streams/command.ts": "8e1e84f6d94637d8814abfac91de0916e97c6ea7d2ccab9ea9e3c9f2de283602",
+    "https://deno.land/x/redis@v0.32.4/protocol/deno_streams/mod.ts": "346d473bd4e834e397ca25bbbf1021f44e577adda8d6391a41bd03b7bc8c72f4",
+    "https://deno.land/x/redis@v0.32.4/protocol/deno_streams/reply.ts": "2707e9fe18608c1a9a49b4f0094397c7400141b8208170c7bcb128ceb5ddd790",
+    "https://deno.land/x/redis@v0.32.4/protocol/shared/command.ts": "71639adc162dac95fa41d701a7112bcd5d5cf3fd22c1307c8840f983628540be",
+    "https://deno.land/x/redis@v0.32.4/protocol/shared/reply.ts": "3311ff66357bacbd60785cb43b97539c341d8a7d963bc5e80cb864ac81909ea5",
+    "https://deno.land/x/redis@v0.32.4/protocol/shared/types.ts": "3d1ff5983abc1e4e56c751aaf4672042c87334cd004ce2fc0493575432151e1f",
+    "https://deno.land/x/redis@v0.32.4/pubsub.ts": "a36892455b0a4a50af169332a165b0985cc90d84486087f036e507e3137b2afb",
+    "https://deno.land/x/redis@v0.32.4/redis.ts": "88e72636c0c8653bd162c3127df696bab3334d0e476e184968f172121e1e4b48",
+    "https://deno.land/x/redis@v0.32.4/stream.ts": "d43076815d046eb8428fcd2799544a9fd07b3480099f5fc67d2ba12fdc73725f",
+    "https://deno.land/x/redis@v0.32.4/vendor/https/deno.land/std/async/delay.ts": "fe34af2a0f5fe1e45de50cdffb4dea2136cfcc34e3d9987531257fc4cd6eb157",
+    "https://deno.land/x/redis@v0.32.4/vendor/https/deno.land/std/bytes/concat.ts": "095fe22eb3c52354b4d276be54e9326c751d70a5f8a8d072e5d761cb6f2cc092",
+    "https://deno.land/x/redis@v0.32.4/vendor/https/deno.land/std/io/buf_reader.ts": "1f69be7812696545786985c22301d992c3f3ff10c551697a33894509156c1647",
+    "https://deno.land/x/redis@v0.32.4/vendor/https/deno.land/std/io/buf_writer.ts": "6825a21ef8eeca1a1d30e29f6278d512c47eeac7086fbe9a93d0618acbd3f47b"
+  },
   "workspace": {
     "packageJson": {
       "dependencies": [
@@ -5348,6 +5420,7 @@
         "npm:@stagewise/toolbar-react@~0.6.2",
         "npm:@tailwindcss/postcss@^4.1.11",
         "npm:@tailwindcss/vite@^4.1.11",
+        "npm:@types/qrcode@^1.5.5",
         "npm:@types/react-dom@^19.1.6",
         "npm:@types/react-router-dom@^5.3.3",
         "npm:@types/react@^19.1.8",
@@ -5362,7 +5435,9 @@
         "npm:globals@^16.3.0",
         "npm:lucide-react@0.532",
         "npm:postcss@^8.5.6",
+        "npm:qrcode@^1.5.4",
         "npm:react-dom@^19.1.0",
+        "npm:react-qr-code@^2.0.18",
         "npm:react-router-dom@^7.7.1",
         "npm:react@^19.1.0",
         "npm:tailwind-merge@^3.3.1",

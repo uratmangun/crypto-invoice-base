@@ -22,29 +22,50 @@ export default function ViewInvoice() {
   const [isLoading, setIsLoading] = useState(true)
   const [paymentInProgress, setPaymentInProgress] = useState(false)
 
-  // Mock data - in real app this would fetch from API
+  // Fetch real invoice data from API
   useEffect(() => {
     const fetchInvoiceData = async () => {
+      if (!invoiceId) {
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(true)
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Mock invoice data
-      const mockData: InvoiceData = {
-        invoiceNumber: invoiceId || 'INV-1753870405376',
-        clientName: 'Acme Corporation',
-        description: 'Web development services for Q1 2024\n- Frontend development\n- Backend API integration\n- Testing and deployment\n- Mobile responsiveness optimization',
-        amount: '2500.00',
-        dueDate: '2024-02-15',
-        walletAddress: '0x742d35Cc6634C0532925a3b8D4f12345abcdef67',
-        status: 'pending',
-        createdDate: '2024-01-15',
-        noDeadline: false
+      try {
+        // Get API URL from environment or fallback to localhost
+        const apiUrl = import.meta.env.VITE_DENO_API_URL || 'http://localhost:8000'
+        
+        const response = await fetch(`${apiUrl}/api/get-invoice/${invoiceId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            console.error('Invoice not found')
+            setInvoiceData(null)
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+        } else {
+          const result = await response.json()
+          
+          if (result.success && result.invoice) {
+            setInvoiceData(result.invoice)
+          } else {
+            console.error('Invalid response format:', result)
+            setInvoiceData(null)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching invoice:', error)
+        setInvoiceData(null)
+      } finally {
+        setIsLoading(false)
       }
-      
-      setInvoiceData(mockData)
-      setIsLoading(false)
     }
 
     fetchInvoiceData()

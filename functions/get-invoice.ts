@@ -1,4 +1,5 @@
-import { connect } from "https://deno.land/x/redis@v0.32.4/mod.ts";
+// Using Deno KV for local development and production
+// No external dependencies needed!
 
 interface InvoiceData {
   invoiceNumber: string;
@@ -47,36 +48,56 @@ export default async function handler(req: Request): Promise<Response> {
       );
     }
 
-    // Get Redis URL from environment variables
-    const redisUrl = Deno.env.get('REDIS_URL');
-    if (!redisUrl) {
-      console.error('REDIS_URL environment variable not set');
-      return new Response(
-        JSON.stringify({ error: 'Redis connection not configured' }),
-        { status: 500, headers }
-      );
+    // Try Deno KV first, fallback to file storage
+    let invoice: InvoiceData | null = null;
+    
+    try {
+      // Check if Deno KV is available (Deno 1.32+)
+      if (typeof Deno.openKv === 'function') {
+        console.log('Using Deno KV for retrieval...');
+        const kv = await Deno.openKv();
+        
+        // Create invoice key
+        const invoiceKey = ["invoice", invoiceId];
+        
+        // Get invoice data from Deno KV
+        const result = await kv.get(invoiceKey);
+        
+        // Close KV connection
+        kv.close();
+        
+        if (result.value) {
+          invoice = result.value as InvoiceData;
+        }
+      } else {
+        throw new Error('Deno KV not available, using file storage');
+      }
+    } catch (kvError) {
+      console.log('Deno KV not available, using file storage:', kvError.message);
+      
+      // Fallback to file-based storage
+      const dataDir = './data';
+      const invoicesFile = `${dataDir}/invoices.json`;
+      
+      try {
+        const fileContent = await Deno.readTextFile(invoicesFile);
+        const existingInvoices: InvoiceData[] = JSON.parse(fileContent);
+        
+        // Find the invoice by invoice number
+        invoice = existingInvoices.find(inv => inv.invoiceNumber === invoiceId) || null;
+        
+        console.log('Invoice retrieved from file storage');
+      } catch (error) {
+        console.log('No invoices file found or error reading it:', error.message);
+      }
     }
-
-    // Connect to Redis
-    const redis = await connect({ url: redisUrl });
-
-    // Create invoice key
-    const invoiceKey = `invoice:${invoiceId}`;
-
-    // Get invoice data from Redis
-    const invoiceData = await redis.get(invoiceKey);
-
-    await redis.quit();
-
-    if (!invoiceData) {
+    
+    if (!invoice) {
       return new Response(
         JSON.stringify({ error: 'Invoice not found' }),
         { status: 404, headers }
       );
     }
-
-    // Parse the JSON data
-    const invoice: InvoiceData = JSON.parse(invoiceData);
 
     console.log(`Invoice ${invoiceId} retrieved successfully`);
 

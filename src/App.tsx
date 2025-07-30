@@ -7,6 +7,7 @@ import { Home } from '@/pages/Home'
 import { CreateInvoice } from '@/pages/CreateInvoice'
 import { Login } from '@/pages/Login'
 import ViewInvoice from '@/pages/ViewInvoice'
+import { ReceivePayment } from '@/pages/ReceivePayment'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/create-invoice" element={<CreateInvoice />} />
           <Route path="/login" element={<Login />} />
           <Route path="/pay/:invoiceId" element={<ViewInvoice />} />
+          <Route path="/receive-payment" element={<ReceivePayment />} />
         </Routes>
       </Router>
     </ThemeProvider>

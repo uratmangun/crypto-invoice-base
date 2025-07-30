@@ -48,6 +48,8 @@ export function CreateInvoice() {
 
   const [isGenerated, setIsGenerated] = useState(false)
   const [paymentLink, setPaymentLink] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [noDeadline, setNoDeadline] = useState(false)
   
   // Privy authentication and navigation hooks
@@ -70,12 +72,56 @@ export function CreateInvoice() {
     }))
   }
 
-  const generateInvoice = () => {
-    // Generate payment link using current domain
-    const currentDomain = window.location.origin
-    const paymentLink = `${currentDomain}/pay/${invoiceData.invoiceNumber}`
-    setPaymentLink(paymentLink)
-    setIsGenerated(true)
+  const generateInvoice = async () => {
+    setIsLoading(true)
+    setSaveError('')
+    
+    try {
+      // Prepare invoice data for saving
+      const invoiceToSave = {
+        invoiceNumber: invoiceData.invoiceNumber,
+        clientName: invoiceData.clientName,
+        description: invoiceData.description,
+        amount: invoiceData.amount,
+        dueDate: noDeadline ? '' : invoiceData.dueDate,
+        walletAddress: invoiceData.walletAddress,
+        createdDate: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        noDeadline: noDeadline
+      }
+
+      // Get API URL from environment or use default
+      const apiUrl = import.meta.env.VITE_DENO_API_URL || 'http://localhost:8000'
+      
+      // Save invoice to backend
+      const response = await fetch(`${apiUrl}/save-invoice`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(invoiceToSave)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save invoice')
+      }
+
+      const result = await response.json()
+      console.log('Invoice saved successfully:', result)
+
+      // Generate payment link using current domain
+      const currentDomain = window.location.origin
+      const paymentLink = `${currentDomain}/pay/${invoiceData.invoiceNumber}`
+      setPaymentLink(paymentLink)
+      setIsGenerated(true)
+      
+    } catch (error) {
+      console.error('Error saving invoice:', error)
+      setSaveError(error instanceof Error ? error.message : 'Failed to save invoice')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const copyToClipboard = (text: string) => {
@@ -470,16 +516,35 @@ export function CreateInvoice() {
             <div className="mt-8 pt-6 border-t">
               <Button
                 onClick={generateInvoice}
-                disabled={!isFormValid}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                disabled={!isFormValid || isLoading}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
               >
-                <FileText className="mr-2 h-5 w-5" />
-                Generate Invoice
+                {isLoading ? (
+                  <>
+                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Saving Invoice...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-5 w-5" />
+                    Generate Invoice
+                  </>
+                )}
               </Button>
-              {!isFormValid && (
+              {!isFormValid && !saveError && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
                   Please fill in all required fields to generate your invoice
                 </p>
+              )}
+              {saveError && (
+                <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                    Error: {saveError}
+                  </p>
+                  <p className="text-xs text-red-500 dark:text-red-500 text-center mt-1">
+                    Please try again or check your connection
+                  </p>
+                </div>
               )}
             </div>
           </CardContent>

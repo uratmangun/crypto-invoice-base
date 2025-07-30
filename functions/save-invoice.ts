@@ -1,4 +1,5 @@
-import { connect } from "https://deno.land/x/redis@v0.32.4/mod.ts";
+// Using Deno KV for local development and production
+// No external dependencies needed!
 
 interface InvoiceData {
   invoiceNumber: string;
@@ -48,22 +49,6 @@ export default async function handler(req: Request): Promise<Response> {
       );
     }
 
-    // Get Redis URL from environment variables
-    const redisUrl = Deno.env.get('REDIS_URL');
-    if (!redisUrl) {
-      console.error('REDIS_URL environment variable not set');
-      return new Response(
-        JSON.stringify({ error: 'Redis connection not configured' }),
-        { status: 500, headers }
-      );
-    }
-
-    // Connect to Redis
-    const redis = await connect({ url: redisUrl });
-
-    // Create invoice key
-    const invoiceKey = `invoice:${invoiceData.invoiceNumber}`;
-
     // Add created date and status if not provided
     const invoiceToSave = {
       ...invoiceData,
@@ -71,17 +56,68 @@ export default async function handler(req: Request): Promise<Response> {
       status: invoiceData.status || 'pending'
     };
 
-    // Save invoice data to Redis as JSON
-    await redis.set(invoiceKey, JSON.stringify(invoiceToSave));
-
-    // Set expiration to 1 year (31536000 seconds)
-    await redis.expire(invoiceKey, 31536000);
-
-    // Also add to a list of all invoices for easier querying
-    await redis.zadd('invoices:all', Date.now(), invoiceData.invoiceNumber);
-
-    // Close Redis connection
-    await redis.quit();
+    // Try Deno KV first, fallback to file storage
+    let saveSuccess = false;
+    
+    try {
+      // Check if Deno KV is available (Deno 1.32+)
+      if (typeof Deno.openKv === 'function') {
+        console.log('Using Deno KV for storage...');
+        const kv = await Deno.openKv();
+        
+        // Create invoice key
+        const invoiceKey = ["invoice", invoiceData.invoiceNumber];
+        
+        // Save invoice data to Deno KV
+        const result = await kv.set(invoiceKey, invoiceToSave);
+        
+        // Also add to a list of all invoices for easier querying
+        const allInvoicesKey = ["invoices", "all", Date.now()];
+        await kv.set(allInvoicesKey, invoiceData.invoiceNumber);
+        
+        // Close KV connection
+        kv.close();
+        
+        saveSuccess = result.ok;
+      } else {
+        throw new Error('Deno KV not available, using file storage');
+      }
+    } catch (kvError) {
+      console.log('Deno KV not available, using file storage:', kvError.message);
+      
+      // Fallback to file-based storage
+      const dataDir = './data';
+      const invoicesFile = `${dataDir}/invoices.json`;
+      
+      // Ensure data directory exists
+      try {
+        await Deno.mkdir(dataDir, { recursive: true });
+      } catch (error) {
+        // Directory might already exist
+      }
+      
+      // Read existing invoices or create empty array
+      let existingInvoices = [];
+      try {
+        const fileContent = await Deno.readTextFile(invoicesFile);
+        existingInvoices = JSON.parse(fileContent);
+      } catch (error) {
+        // File doesn't exist yet, start with empty array
+      }
+      
+      // Add new invoice
+      existingInvoices.push(invoiceToSave);
+      
+      // Save back to file
+      await Deno.writeTextFile(invoicesFile, JSON.stringify(existingInvoices, null, 2));
+      
+      saveSuccess = true;
+      console.log('Invoice saved to file storage');
+    }
+    
+    if (!saveSuccess) {
+      throw new Error('Failed to save invoice to database');
+    }
 
     console.log(`Invoice ${invoiceData.invoiceNumber} saved successfully`);
 
