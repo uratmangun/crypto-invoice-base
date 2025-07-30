@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { usePrivy } from '@privy-io/react-auth'
+import { InvoiceStorage } from '@/utils/storage'
 
 interface InvoiceData {
   invoiceNumber: string
@@ -90,24 +91,13 @@ export function CreateInvoice() {
         noDeadline: noDeadline
       }
 
-      // Get API URL from environment or use default
-      const apiUrl = import.meta.env.VITE_DENO_API_URL || 'http://localhost:8000'
+      // Save invoice using the storage utility (localStorage in dev, API in production)
+      const result = await InvoiceStorage.saveInvoice(invoiceToSave)
       
-      // Save invoice to backend
-      const response = await fetch(`${apiUrl}/save-invoice`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(invoiceToSave)
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save invoice')
+      if (!result.success) {
+        throw new Error(result.message)
       }
-
-      const result = await response.json()
+      
       console.log('Invoice saved successfully:', result)
 
       // Generate payment link using current domain
@@ -126,6 +116,24 @@ export function CreateInvoice() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
+  }
+
+  const handleCreateAnother = () => {
+    // Reset form state
+    setIsGenerated(false)
+    setSaveError('')
+    setPaymentLink('')
+    setNoDeadline(false)
+    
+    // Generate new invoice number and reset form data
+    setInvoiceData({
+      invoiceNumber: `INV-${Date.now()}`,
+      clientName: '',
+      description: '',
+      amount: '',
+      dueDate: '',
+      walletAddress: ''
+    })
   }
 
   const isFormValid = invoiceData.clientName && 
@@ -300,7 +308,7 @@ export function CreateInvoice() {
 
               <div className="flex gap-4">
                 <Button 
-                  onClick={() => setIsGenerated(false)}
+                  onClick={handleCreateAnother}
                   variant="outline"
                   className="flex-1"
                 >

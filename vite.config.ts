@@ -11,4 +11,10 @@ export default defineConfig({
     },
     dedupe: ['react', 'react-dom'],
   },
+  server: {
+    watch: {
+      // Ignore storage directory and data files to prevent page reloads
+      ignored: ['**/storage/**', '**/data/**', '**/*.json']
+    }
+  }
 })

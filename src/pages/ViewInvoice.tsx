@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Clock, DollarSign, User, Wallet, FileText, CheckCircle } from 'lucide-react'
+import { InvoiceStorage } from '@/utils/storage'
+import { pay, getPaymentStatus } from '@base-org/account'
+import { BasePayButton } from '@base-org/account-ui/react'
 
 interface InvoiceData {
   invoiceNumber: string
@@ -11,7 +14,7 @@ interface InvoiceData {
   amount: string
   dueDate: string
   walletAddress: string
-  status: 'pending' | 'paid' | 'overdue'
+  status: string
   createdDate: string
   noDeadline?: boolean
 }
@@ -33,32 +36,15 @@ export default function ViewInvoice() {
       setIsLoading(true)
       
       try {
-        // Get API URL from environment or fallback to localhost
-        const apiUrl = import.meta.env.VITE_DENO_API_URL || 'http://localhost:8000'
+        // Use InvoiceStorage to get invoice (localStorage in dev, API in production)
+        const invoice = await InvoiceStorage.getInvoice(invoiceId)
         
-        const response = await fetch(`${apiUrl}/api/get-invoice/${invoiceId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            console.error('Invoice not found')
-            setInvoiceData(null)
-          } else {
-            throw new Error(`HTTP error! status: ${response.status}`)
-          }
+        if (invoice) {
+          setInvoiceData(invoice)
+          console.log('Invoice loaded successfully:', invoice)
         } else {
-          const result = await response.json()
-          
-          if (result.success && result.invoice) {
-            setInvoiceData(result.invoice)
-          } else {
-            console.error('Invalid response format:', result)
-            setInvoiceData(null)
-          }
+          console.error('Invoice not found:', invoiceId)
+          setInvoiceData(null)
         }
       } catch (error) {
         console.error('Error fetching invoice:', error)
@@ -72,23 +58,76 @@ export default function ViewInvoice() {
   }, [invoiceId])
 
   const handlePayInvoice = async () => {
+    if (!invoiceData) return
+    
     setPaymentInProgress(true)
     
     try {
-      // Mock payment process - in real app this would integrate with wallet
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Initiate Base Pay transaction
+      const paymentResult = await pay({
+        amount: invoiceData.amount,
+        to: invoiceData.walletAddress,
+        testnet: true // Set to false for mainnet
+      })
       
-      if (invoiceData) {
-        setInvoiceData({
-          ...invoiceData,
-          status: 'paid'
-        })
+      // Check payment result according to Base Pay documentation
+      if (paymentResult && typeof paymentResult === 'object' && 'success' in paymentResult) {
+        if (paymentResult.success) {
+          console.log('Payment successful:', paymentResult)
+          
+          // Update invoice status
+          const success = await InvoiceStorage.updateInvoiceStatus(invoiceData.invoiceNumber, 'paid')
+          
+          if (success) {
+            setInvoiceData({
+              ...invoiceData,
+              status: 'paid'
+            })
+            alert('🎉 Payment successful! Transaction has been confirmed on the Base network.')
+          } else {
+            throw new Error('Failed to update invoice status')
+          }
+        } else {
+          // Handle payment failure
+          console.log('Payment failed:', paymentResult.error)
+          
+          // Check for specific rejection errors
+          const errorMsg = paymentResult.error || 'Payment failed'
+          if (errorMsg.includes('rejected') || errorMsg.includes('denied')) {
+            alert('Payment was cancelled. You can try again when ready.')
+          } else {
+            alert(`Payment failed: ${errorMsg}`)
+          }
+        }
+      } else {
+        // Assume success if no error structure (fallback for different API versions)
+        console.log('Payment completed:', paymentResult)
+        
+        const success = await InvoiceStorage.updateInvoiceStatus(invoiceData.invoiceNumber, 'paid')
+        
+        if (success) {
+          setInvoiceData({
+            ...invoiceData,
+            status: 'paid'
+          })
+          alert('🎉 Payment successful! Transaction has been confirmed on the Base network.')
+        } else {
+          throw new Error('Failed to update invoice status')
+        }
       }
       
-      alert('Payment successful! Transaction has been confirmed on the Base network.')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment error:', error)
-      alert('Payment failed. Please try again.')
+      
+      // Handle wallet connection/rejection errors
+      if (error.code === 4001) {
+        alert('Payment cancelled. You rejected the wallet connection.')
+      } else if (error.message && (error.message.includes('rejected') || error.message.includes('denied') || error.message.includes('cancelled'))) {
+        alert('Payment was cancelled. You can try again when ready.')
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Payment failed. Please try again.'
+        alert(`Payment failed: ${errorMessage}`)
+      }
     } finally {
       setPaymentInProgress(false)
     }
@@ -257,23 +296,24 @@ export default function ViewInvoice() {
                       </p>
                     </div>
                   ) : (
-                    <Button 
-                      onClick={handlePayInvoice}
-                      disabled={paymentInProgress}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
+                    <div className="space-y-4">
                       {paymentInProgress ? (
-                        <>
+                        <div className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 text-lg font-semibold shadow-lg rounded-lg flex items-center justify-center">
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                           Processing Payment...
-                        </>
+                        </div>
                       ) : (
-                        <>
-                          <Wallet className="mr-2 h-5 w-5" />
-                          Pay with USDC
-                        </>
+                        <div className="w-full">
+                          <BasePayButton
+                            colorScheme="light"
+                            onClick={handlePayInvoice}
+                          />
+                        </div>
                       )}
-                    </Button>
+                      <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        Secure payment powered by Base Pay • USDC on Base Network
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

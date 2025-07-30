@@ -86,7 +86,8 @@ export default async function handler(req: Request): Promise<Response> {
       console.log('Deno KV not available, using file storage:', kvError.message);
       
       // Fallback to file-based storage
-      const dataDir = './data';
+      // Use a directory outside the source to avoid Vite watching it
+      const dataDir = './storage/data';
       const invoicesFile = `${dataDir}/invoices.json`;
       
       // Ensure data directory exists
