@@ -1,5 +1,7 @@
 // Using Deno KV for local development and production
-// No external dependencies needed!
+// Updated for Deno 2.x with @deno/kv module
+
+import { openKv } from "@deno/kv";
 
 interface InvoiceData {
   invoiceNumber: string;
@@ -48,48 +50,33 @@ export default async function handler(req: Request): Promise<Response> {
       );
     }
 
-    // Try Deno KV first, fallback to file storage
+    // Use persistent SQLite-based Deno KV
     let invoice: InvoiceData | null = null;
     
     try {
-      // Check if Deno KV is available (Deno 1.32+)
-      if (typeof Deno.openKv === 'function') {
-        console.log('Using Deno KV for retrieval...');
-        const kv = await Deno.openKv();
-        
-        // Create invoice key
-        const invoiceKey = ["invoice", invoiceId];
-        
-        // Get invoice data from Deno KV
-        const result = await kv.get(invoiceKey);
-        
-        // Close KV connection
-        kv.close();
-        
-        if (result.value) {
-          invoice = result.value as InvoiceData;
-        }
+      console.log('Using persistent SQLite-based Deno KV for retrieval...');
+      
+      // Open persistent SQLite-based KV store
+      const kv = await openKv();
+      
+      // Create invoice key
+      const invoiceKey = ["invoice", invoiceId];
+      
+      // Get invoice data from Deno KV
+      const result = await kv.get(invoiceKey);
+      
+      // Close KV connection
+      kv.close();
+      
+      if (result.value) {
+        invoice = result.value as InvoiceData;
+        console.log('Invoice retrieved from SQLite KV successfully');
       } else {
-        throw new Error('Deno KV not available, using file storage');
+        console.log('Invoice not found in SQLite KV');
       }
     } catch (kvError) {
-      console.log('Deno KV not available, using file storage:', kvError.message);
-      
-      // Fallback to file-based storage
-      const dataDir = './data';
-      const invoicesFile = `${dataDir}/invoices.json`;
-      
-      try {
-        const fileContent = await Deno.readTextFile(invoicesFile);
-        const existingInvoices: InvoiceData[] = JSON.parse(fileContent);
-        
-        // Find the invoice by invoice number
-        invoice = existingInvoices.find(inv => inv.invoiceNumber === invoiceId) || null;
-        
-        console.log('Invoice retrieved from file storage');
-      } catch (error) {
-        console.log('No invoices file found or error reading it:', error.message);
-      }
+      console.error('Error with Deno KV:', kvError);
+      throw new Error(`Failed to retrieve invoice from KV: ${kvError.message}`);
     }
     
     if (!invoice) {

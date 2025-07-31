@@ -36,6 +36,10 @@ export default function ViewInvoice() {
       setIsLoading(true)
       
       try {
+        console.log(`Fetching invoice: ${invoiceId}`);
+        console.log(`Development mode: ${import.meta.env.DEV}`);
+        console.log(`API URL: ${import.meta.env.VITE_DENO_API_URL || 'http://localhost:8000'}`);
+        
         // Use InvoiceStorage to get invoice (localStorage in dev, API in production)
         const invoice = await InvoiceStorage.getInvoice(invoiceId)
         

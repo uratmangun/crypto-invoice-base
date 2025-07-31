@@ -3,6 +3,7 @@ import helloFunction from './functions/hello.ts';
 import authVerifyFunction from './functions/auth/verify.ts';
 import saveInvoiceFunction from './functions/save-invoice.ts';
 import getInvoiceFunction from './functions/get-invoice.ts';
+import updateInvoiceFunction from './functions/update-invoice.ts';
 
 // Type definitions for function handlers
 type FunctionHandler = {
@@ -14,6 +15,7 @@ const functions: Record<string, FunctionHandler> = {
   hello: helloFunction,
   'save-invoice': saveInvoiceFunction,
   'get-invoice': getInvoiceFunction,
+  'update-invoice': updateInvoiceFunction,
   // Add more functions here as you create them
   // example: exampleFunction,
 };

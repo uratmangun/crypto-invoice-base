@@ -21,13 +21,9 @@ export class InvoiceStorage {
     return import.meta.env.DEV || window.location.hostname === 'localhost';
   }
 
-  // Save invoice to localStorage (development) or API (production)
+  // Save invoice to API (always use SQLite KV backend)
   static async saveInvoice(invoiceData: InvoiceData): Promise<{ success: boolean; message: string; invoiceNumber: string }> {
-    if (this.isDevelopment()) {
-      return this.saveToLocalStorage(invoiceData);
-    } else {
-      return this.saveToAPI(invoiceData);
-    }
+    return this.saveToAPI(invoiceData);
   }
 
   // Save to localStorage for development
@@ -110,14 +106,9 @@ export class InvoiceStorage {
     }
   }
 
-  // Get a specific invoice by ID
+  // Get a specific invoice by ID (always use SQLite KV backend)
   static async getInvoice(invoiceNumber: string): Promise<InvoiceData | null> {
-    if (this.isDevelopment()) {
-      const invoices = this.getLocalInvoices();
-      return invoices.find(invoice => invoice.invoiceNumber === invoiceNumber) || null;
-    } else {
-      return this.getInvoiceFromAPI(invoiceNumber);
-    }
+    return this.getInvoiceFromAPI(invoiceNumber);
   }
 
   // Get invoice from API for production
@@ -146,22 +137,45 @@ export class InvoiceStorage {
     }
   }
 
-  // Get all invoices (for future use)
+  // Get all invoices (for future use) - always use SQLite KV backend
   static async getAllInvoices(): Promise<InvoiceData[]> {
-    if (this.isDevelopment()) {
-      return this.getLocalInvoices();
-    } else {
-      // TODO: Implement API call to get all invoices
-      return [];
-    }
+    // TODO: Implement API call to get all invoices from SQLite KV
+    return [];
   }
 
-  // Update invoice status (e.g., mark as paid)
+  // Update invoice status (e.g., mark as paid) - always use SQLite KV backend
   static async updateInvoiceStatus(invoiceNumber: string, status: string): Promise<boolean> {
-    if (this.isDevelopment()) {
-      return this.updateLocalInvoiceStatus(invoiceNumber, status);
-    } else {
-      // TODO: Implement API call to update invoice status
+    return this.updateInvoiceStatusAPI(invoiceNumber, status);
+  }
+
+  // Update invoice status via API for production
+  private static async updateInvoiceStatusAPI(invoiceNumber: string, status: string): Promise<boolean> {
+    try {
+      const apiUrl = import.meta.env.VITE_DENO_API_URL || 'http://localhost:8000';
+      const endpoint = `${apiUrl}/api/update-invoice`;
+
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invoiceNumber,
+          status
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update invoice status');
+      }
+
+      const result = await response.json();
+      console.log('Invoice status updated successfully via API:', result);
+
+      return result.success;
+    } catch (error) {
+      console.error('Error updating invoice status via API:', error);
       return false;
     }
   }

@@ -1,14 +1,15 @@
 {
   "nodeModulesDir": "auto",
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --env=.env --watch server.ts",
-    "start": "deno run --allow-net --allow-read --allow-write --allow-env --env=.env server.ts",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --allow-sys --env=.env --watch server.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env --allow-sys --env=.env server.ts",
     "main": "deno run --allow-net --allow-read --allow-write --allow-env --env=.env main.ts",
     "function": "deno run --allow-net --allow-read --allow-write --allow-env --env=.env functions/hello.ts",
     "save-invoice": "deno run --allow-net --allow-read --allow-write --allow-env --env=.env functions/save-invoice.ts"
   },
   "imports": {
     "@std/": "https://deno.land/std@0.208.0/",
+    "@deno/kv": "npm:@deno/kv@^0.8.0",
     "./": "./",
     "../": "../"
   },

@@ -1,5 +1,7 @@
 // Using Deno KV for local development and production
-// No external dependencies needed!
+// Updated for Deno 2.x with @deno/kv module
+
+import { openKv } from "@deno/kv";
 
 interface InvoiceData {
   invoiceNumber: string;
@@ -56,64 +58,43 @@ export default async function handler(req: Request): Promise<Response> {
       status: invoiceData.status || 'pending'
     };
 
-    // Try Deno KV first, fallback to file storage
+    // Use persistent SQLite-based Deno KV
     let saveSuccess = false;
     
     try {
-      // Check if Deno KV is available (Deno 1.32+)
-      if (typeof Deno.openKv === 'function') {
-        console.log('Using Deno KV for storage...');
-        const kv = await Deno.openKv();
-        
-        // Create invoice key
-        const invoiceKey = ["invoice", invoiceData.invoiceNumber];
-        
-        // Save invoice data to Deno KV
-        const result = await kv.set(invoiceKey, invoiceToSave);
-        
-        // Also add to a list of all invoices for easier querying
-        const allInvoicesKey = ["invoices", "all", Date.now()];
-        await kv.set(allInvoicesKey, invoiceData.invoiceNumber);
-        
-        // Close KV connection
-        kv.close();
-        
-        saveSuccess = result.ok;
-      } else {
-        throw new Error('Deno KV not available, using file storage');
-      }
+      console.log('Using persistent SQLite-based Deno KV for storage...');
+      
+      // Open persistent SQLite-based KV store
+      const kv = await openKv();
+      
+      // Create invoice key
+      const invoiceKey = ["invoice", invoiceData.invoiceNumber];
+      
+      // Save invoice data to Deno KV
+      const result = await kv.set(invoiceKey, invoiceToSave);
+      
+      // Also add to a list of all invoices for easier querying
+      const allInvoicesKey = ["invoices", "all", Date.now()];
+      await kv.set(allInvoicesKey, invoiceData.invoiceNumber);
+      
+      // Add to invoice index for listing
+      const indexKey = ["invoice_index", invoiceData.invoiceNumber];
+      await kv.set(indexKey, {
+        invoiceNumber: invoiceData.invoiceNumber,
+        clientName: invoiceData.clientName,
+        amount: invoiceData.amount,
+        status: invoiceToSave.status,
+        createdDate: invoiceToSave.createdDate
+      });
+      
+      // Close KV connection
+      kv.close();
+      
+      saveSuccess = result.ok;
+      console.log('Invoice saved to SQLite KV successfully');
     } catch (kvError) {
-      console.log('Deno KV not available, using file storage:', kvError.message);
-      
-      // Fallback to file-based storage
-      // Use a directory outside the source to avoid Vite watching it
-      const dataDir = './storage/data';
-      const invoicesFile = `${dataDir}/invoices.json`;
-      
-      // Ensure data directory exists
-      try {
-        await Deno.mkdir(dataDir, { recursive: true });
-      } catch (error) {
-        // Directory might already exist
-      }
-      
-      // Read existing invoices or create empty array
-      let existingInvoices = [];
-      try {
-        const fileContent = await Deno.readTextFile(invoicesFile);
-        existingInvoices = JSON.parse(fileContent);
-      } catch (error) {
-        // File doesn't exist yet, start with empty array
-      }
-      
-      // Add new invoice
-      existingInvoices.push(invoiceToSave);
-      
-      // Save back to file
-      await Deno.writeTextFile(invoicesFile, JSON.stringify(existingInvoices, null, 2));
-      
-      saveSuccess = true;
-      console.log('Invoice saved to file storage');
+      console.error('Error with Deno KV:', kvError);
+      throw new Error(`Failed to save invoice to KV: ${kvError.message}`);
     }
     
     if (!saveSuccess) {
